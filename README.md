@@ -15,12 +15,14 @@ Recovered from `6.aab` and rebuilt as a clean Expo Router project.
   - `expo-notifications`
   - calorie widget integration
 
-## Rebuilt first pass
+## Rebuilt app
 
 - Expo Router route tree with onboarding, sign-in, sign-up, and tabs
 - Tabs for home, workouts, nutrition, calendar, stats, and account
 - Local SQLite schema for sessions, exercises, sets, nutrition, bodyweight, sleep, steps, step logs, and templates
-- Supabase client stub via env vars
+- Supabase auth session handling via secure storage
+- Local-first CRUD for workouts, nutrition, bodyweight, sleep, steps, and templates
+- Manual Supabase sync for the main entry tables
 - Notification permission entry point
 
 ## Run
@@ -38,6 +40,8 @@ Create `.env` with:
 EXPO_PUBLIC_SUPABASE_URL=
 EXPO_PUBLIC_SUPABASE_ANON_KEY=
 ```
+
+Apply the SQL schema in [supabase/schema.sql](/home/aman/Repos/zentrackr/supabase/schema.sql) to your Supabase project before testing sign-in and sync.
 
 ## Notes
 

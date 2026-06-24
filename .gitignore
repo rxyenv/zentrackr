@@ -3,6 +3,7 @@ node_modules
 .expo-shared
 .android-sdk
 .gradle
+.gradle-local
 .vscode
 dist
 web-build

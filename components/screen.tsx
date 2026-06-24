@@ -1,5 +1,5 @@
 import { PropsWithChildren } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TextInput, TextInputProps, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors, spacing } from "../lib/theme";
@@ -13,10 +13,12 @@ export function Screen({ title, subtitle, children }: ScreenProps) {
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.title}>{title}</Text>
-          {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
-        </View>
+        {title ? (
+          <View style={styles.header}>
+            <Text style={styles.title}>{title}</Text>
+            {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+          </View>
+        ) : null}
         {children}
       </ScrollView>
     </SafeAreaView>
@@ -25,6 +27,16 @@ export function Screen({ title, subtitle, children }: ScreenProps) {
 
 export function Card({ children }: PropsWithChildren) {
   return <View style={styles.card}>{children}</View>;
+}
+
+export function Field(props: TextInputProps) {
+  return (
+    <TextInput
+      placeholderTextColor={colors.muted}
+      style={styles.input}
+      {...props}
+    />
+  );
 }
 
 export const styles = StyleSheet.create({
@@ -41,8 +53,8 @@ export const styles = StyleSheet.create({
   },
   title: {
     color: colors.ink,
-    fontSize: 32,
-    fontWeight: "800",
+    fontSize: 24,
+    fontWeight: "700",
   },
   subtitle: {
     color: colors.muted,
@@ -51,10 +63,18 @@ export const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: colors.card,
+    borderRadius: 24,
+    padding: spacing.md,
+    gap: spacing.sm,
+  },
+  input: {
+    backgroundColor: colors.surface,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: colors.border,
-    padding: spacing.md,
-    gap: spacing.sm,
+    color: colors.ink,
+    fontSize: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 16,
   },
 });
