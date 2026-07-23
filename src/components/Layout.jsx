@@ -34,7 +34,7 @@ export default function Layout({ children, demo, onExitDemo }) {
           <div className="sidebar-wordmark">
             Z<small style={{ fontSize: '0.65em', letterSpacing: 2 }}>EN</small>T<small style={{ fontSize: '0.65em', letterSpacing: 2 }}>RACKR</small>
           </div>
-          <div className="sidebar-tagline">Programming progress</div>
+          <div className="sidebar-tagline">Track the grind.</div>
         </div>
 
         <div className="sidebar-nav">
