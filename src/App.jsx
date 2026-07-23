@@ -4,7 +4,7 @@ import { useAuth } from './hooks/useAuth'
 import { useAppData } from './hooks/useAppData'
 import { useMockData } from './hooks/useMockData'
 import Layout from './components/Layout'
-import Auth from './pages/Auth'
+import Landing from './pages/Landing'
 import Dashboard from './pages/Dashboard'
 import Rust from './pages/Rust'
 import EditRoadmap from './pages/EditRoadmap'
@@ -16,17 +16,29 @@ function AppRoutes() {
   const session = useAuth()
   const [demo, setDemo] = useState(false)
 
-  if (demo) return <DemoApp onExitDemo={() => setDemo(false)} />
-
+  // Still resolving session
   if (session === undefined) {
     return <div className="loading" style={{ padding: 40 }}>Loading…</div>
   }
 
+  if (demo) return <DemoApp onExitDemo={() => setDemo(false)} />
+
   if (!session) {
-    return <Auth onDemo={() => setDemo(true)} />
+    return (
+      <Routes>
+        <Route path="/" element={<Landing onDemo={() => setDemo(true)} />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    )
   }
 
-  return <AuthedApp userId={session.user.id} />
+  // Authenticated
+  return (
+    <Routes>
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/*" element={<AuthedApp userId={session.user.id} />} />
+    </Routes>
+  )
 }
 
 function DemoApp({ onExitDemo }) {
@@ -59,7 +71,6 @@ function AppShell({ data, demo, onExitDemo }) {
   return (
     <Layout demo={demo} onExitDemo={onExitDemo}>
       <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={
           <Dashboard modules={data.modules} sessions={data.sessions} language={data.language} />
         } />
