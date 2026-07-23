@@ -113,3 +113,27 @@ create policy "Users own their profile"
   for all
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
+
+-- Auto-create profile on signup. security definer so the insert
+-- bypasses RLS (trigger runs before the user has a session).
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  insert into public.profiles (user_id) values (new.id)
+  on conflict (user_id) do nothing;
+  return new;
+end;
+$$;
+
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function public.handle_new_user();
+
+-- Table grants: RLS filters rows, but roles still need base privileges.
+grant usage on schema public to authenticated, anon;
+grant select, insert, update, delete on all tables in schema public to authenticated;
+alter default privileges in schema public
+  grant select, insert, update, delete on tables to authenticated;
