@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-556806ae-a683-4ac2-a115-6eb4b3099c6a/styles.css">
+  <script src="_ds/modernist-556806ae-a683-4ac2-a115-6eb4b3099c6a/_ds_bundle.js"></script>
+  <style>
+    body { margin: 0; }
+    a { color: var(--color-accent-700); }
+    a:hover { color: var(--color-accent); }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+  </style>
+</helmet>
+
+<div style="display:flex;min-height:100vh;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body)">
+
+  <div style="width:240px;flex:none;border-right:2px solid var(--color-divider);display:flex;flex-direction:column;padding:32px 0">
+    <div style="padding:0 28px 28px;border-bottom:2px solid var(--color-divider)">
+      <div style="font-family:var(--font-heading);font-weight:700;font-size:20px;letter-spacing:0.02em">Z<span style="font-size:0.72em">EN</span>T<span style="font-size:0.72em">RACKR</span></div>
+      <div style="font-size:12px;color:var(--color-neutral-700);margin-top:4px">Programming progress</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;padding:20px 0;flex:1">
+      <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="6">
+        <button style="{{ item.style }}" onClick="{{ item.onClick }}">{{ item.label }}</button>
+      </sc-for>
+    </div>
+
+    <div style="padding:20px 28px 0;border-top:2px solid var(--color-divider)">
+      <button class="btn btn-ghost btn-block" disabled="{{ true }}" style="justify-content:space-between;display:flex">
+        <span>+ Add language</span>
+        <span class="tag tag-outline">Soon</span>
+      </button>
+    </div>
+  </div>
+
+  <div style="flex:1;padding:48px 56px;max-width:1120px">
+
+    <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:32px">
+          <div>
+            <h1 style="font-family:var(--font-heading);font-size:32px;margin:0;font-weight:700">Dashboard</h1>
+            <div style="font-size:14px;color:var(--color-neutral-700);margin-top:6px">Rust — overview of your learning progress</div>
+          </div>
+          <button class="btn btn-primary" onClick="{{ goToRust }}">Continue learning</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:2px solid var(--color-divider);margin-bottom:40px">
+          <div style="padding:24px 28px;border-right:2px solid var(--color-divider)">
+            <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-neutral-700)">Overall progress</div>
+            <div style="font-family:var(--font-heading);font-size:32px;font-weight:700;margin-top:8px">{{ overallPct }}%</div>
+          </div>
+          <div style="padding:24px 28px;border-right:2px solid var(--color-divider)">
+            <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-neutral-700)">Current streak</div>
+            <div style="font-family:var(--font-heading);font-size:32px;font-weight:700;margin-top:8px">{{ streak }} days</div>
+          </div>
+          <div style="padding:24px 28px;border-right:2px solid var(--color-divider)">
+            <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-neutral-700)">Hours logged</div>
+            <div style="font-family:var(--font-heading);font-size:32px;font-weight:700;margin-top:8px">{{ totalHoursLabel }}</div>
+          </div>
+          <div style="padding:24px 28px">
+            <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-neutral-700)">Days to goal</div>
+            <div style="font-family:var(--font-heading);font-size:32px;font-weight:700;margin-top:8px">{{ goalDaysLeft }}</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:0;border:2px solid var(--color-divider);margin-bottom:40px">
+          <div style="padding:28px;border-right:2px solid var(--color-divider)">
+            <div class="tag tag-neutral" style="margin-bottom:14px">Up next</div>
+            <div style="font-family:var(--font-heading);font-size:20px;font-weight:700">{{ nextTopic.name }}</div>
+            <div style="font-size:13px;color:var(--color-neutral-700);margin-top:4px">{{ nextTopic.moduleName }}</div>
+            <div style="margin-top:20px;height:8px;background:var(--color-neutral-200)">
+              <div style="height:8px;background:var(--color-neutral-800);{{ nextTopic.moduleBarStyle }}"></div>
+            </div>
+            <div style="font-size:12px;color:var(--color-neutral-700);margin-top:8px">{{ nextTopic.moduleProgressLabel }}</div>
+            <button class="btn btn-secondary" style="margin-top:20px" onClick="{{ goToRust }}">Open roadmap</button>
+          </div>
+          <div style="padding:28px">
+            <div class="tag tag-outline" style="margin-bottom:14px">Goal</div>
+            <div style="font-family:var(--font-heading);font-size:18px;font-weight:700">{{ goalNote }}</div>
+            <div style="font-size:13px;color:var(--color-neutral-700);margin-top:8px">Target: {{ goalDate }}</div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px">
+          <h2 style="font-family:var(--font-heading);font-size:18px;margin:0;font-weight:700">Recent sessions</h2>
+          <a href="#" onClick="{{ goToHistory }}" style="font-size:13px">View all →</a>
+        </div>
+        <table class="table">
+          <thead>
+            <tr><th>Date</th><th>Topic</th><th>Duration</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ recentSessions }}" as="s" hint-placeholder-count="5">
+              <tr>
+                <td>{{ s.date }}</td>
+                <td>{{ s.module }}</td>
+                <td>{{ s.durationLabel }}</td>
+                <td style="color:var(--color-neutral-700)">{{ s.notes }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isRust }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+          <div>
+            <h1 style="font-family:var(--font-heading);font-size:32px;margin:0;font-weight:700">Rust</h1>
+            <div style="font-size:14px;color:var(--color-neutral-700);margin-top:6px">{{ doneTopics }} of {{ totalTopics }} topics complete — {{ overallPct }}%</div>
+          </div>
+          <button class="btn btn-secondary" onClick="{{ goToEdit }}">Edit roadmap</button>
+        </div>
+        <div style="height:8px;background:var(--color-neutral-200);margin:24px 0 36px">
+          <div style="height:8px;background:var(--color-neutral-800);width:{{ overallPct }}%"></div>
+        </div>
+
+        <sc-for list="{{ moduleStats }}" as="m" hint-placeholder-count="9">
+          <div style="border-top:2px solid var(--color-divider);padding:24px 0">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px">
+              <div style="font-family:var(--font-heading);font-size:18px;font-weight:700">{{ m.name }}</div>
+              <div style="font-size:13px;color:var(--color-neutral-700)">{{ m.done }}/{{ m.total }}</div>
+            </div>
+            <sc-for list="{{ m.topics }}" as="t" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:14px;padding:8px 0">
+                <input type="checkbox" checked="{{ t.done }}" onChange="{{ t.onToggle }}" style="width:18px;height:18px;accentColor:var(--color-accent);flex:none"/>
+                <div style="flex:1;font-size:15px;{{ t.textStyle }}">{{ t.name }}</div>
+                <a href="{{ t.resourceUrl }}" target="_blank" style="font-size:13px;flex:none">Resource ↗</a>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isEdit }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+          <div>
+            <h1 style="font-family:var(--font-heading);font-size:32px;margin:0;font-weight:700">Edit roadmap</h1>
+            <div style="font-size:14px;color:var(--color-neutral-700);margin-top:6px">Rust — built from the default template, fully editable</div>
+          </div>
+          <button class="btn btn-primary" onClick="{{ addModule }}">+ Add module</button>
+        </div>
+
+        <sc-for list="{{ editModules }}" as="m" hint-placeholder-count="9">
+          <div style="border-top:2px solid var(--color-divider);padding:24px 0">
+            <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px">
+              <input class="input" value="{{ m.name }}" onChange="{{ m.onNameChange }}" style="font-family:var(--font-heading);font-weight:700;font-size:16px;flex:1"/>
+              <button class="btn btn-ghost" onClick="{{ m.onRemove }}">Remove module</button>
+            </div>
+            <sc-for list="{{ m.topics }}" as="t" hint-placeholder-count="4">
+              <div style="display:flex;gap:10px;align-items:center;padding:6px 0">
+                <input type="checkbox" checked="{{ t.done }}" onChange="{{ t.onToggle }}" style="width:16px;height:16px;accentColor:var(--color-accent);flex:none"/>
+                <input class="input" value="{{ t.name }}" onChange="{{ t.onNameChange }}" style="flex:1.4" placeholder="Topic name"/>
+                <input class="input" value="{{ t.resourceUrl }}" onChange="{{ t.onResourceChange }}" style="flex:1" placeholder="Resource URL"/>
+                <button class="btn btn-icon" onClick="{{ t.onRemove }}">✕</button>
+              </div>
+            </sc-for>
+            <button class="btn btn-ghost" style="margin-top:10px" onClick="{{ m.onAddTopic }}">+ Add topic</button>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isStats }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <h1 style="font-family:var(--font-heading);font-size:32px;margin:0 0 32px;font-weight:700">Stats &amp; analytics</h1>
+
+        <div style="border:2px solid var(--color-divider);padding:28px;margin-bottom:36px">
+          <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-neutral-700);margin-bottom:20px">Minutes studied — last 7 days</div>
+          <div style="display:flex;align-items:flex-end;gap:16px;height:160px">
+            <sc-for list="{{ weekChart }}" as="d" hint-placeholder-count="7">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end">
+                <div style="font-size:12px;color:var(--color-neutral-700)">{{ d.minutes }}</div>
+                <div style="width:100%;background:var(--color-neutral-800);{{ d.barStyle }}"></div>
+                <div style="font-size:12px;color:var(--color-neutral-700)">{{ d.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="border:2px solid var(--color-divider);padding:28px;margin-bottom:36px">
+          <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-neutral-700);margin-bottom:20px">Completion by module</div>
+          <sc-for list="{{ moduleStats }}" as="m" hint-placeholder-count="9">
+            <div style="margin-bottom:14px">
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+                <span>{{ m.name }}</span>
+                <span style="color:var(--color-neutral-700)">{{ m.pct }}%</span>
+              </div>
+              <div style="height:8px;background:var(--color-neutral-200)">
+                <div style="height:8px;background:var(--color-neutral-800);width:{{ m.pct }}%"></div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="border:2px solid var(--color-divider);padding:28px">
+          <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-neutral-700);margin-bottom:20px">Last 14 days</div>
+          <div style="display:flex;gap:8px">
+            <sc-for list="{{ heatmap }}" as="d" hint-placeholder-count="14">
+              <div title="{{ d.date }}" style="width:24px;height:24px;{{ d.style }}"></div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isHistory }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px">
+          <h1 style="font-family:var(--font-heading);font-size:32px;margin:0;font-weight:700">Session history</h1>
+          <button class="btn btn-primary" onClick="{{ openLogForm }}">+ Log session</button>
+        </div>
+
+        <sc-if value="{{ showLogForm }}" hint-placeholder-val="{{ false }}">
+          <div style="border:2px solid var(--color-divider);padding:24px;margin-bottom:28px">
+            <div style="font-family:var(--font-heading);font-weight:700;margin-bottom:16px">Log a study session</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+              <div class="field">
+                <label>Date</label>
+                <input class="input" type="date" value="{{ logForm.date }}" onChange="{{ onLogDateChange }}"/>
+              </div>
+              <div class="field">
+                <label>Duration (minutes)</label>
+                <input class="input" type="number" value="{{ logForm.duration }}" onChange="{{ onLogDurationChange }}"/>
+              </div>
+            </div>
+            <div class="field" style="margin-bottom:16px">
+              <label>Topic / module</label>
+              <select class="input" value="{{ logForm.module }}" onChange="{{ onLogModuleChange }}">
+                <sc-for list="{{ moduleNames }}" as="mn" hint-placeholder-count="9">
+                  <option value="{{ mn }}">{{ mn }}</option>
+                </sc-for>
+              </select>
+            </div>
+            <div class="field" style="margin-bottom:20px">
+              <label>Notes</label>
+              <input class="input" value="{{ logForm.notes }}" onChange="{{ onLogNotesChange }}" placeholder="What did you work on?"/>
+            </div>
+            <div style="display:flex;gap:12px">
+              <button class="btn btn-primary" onClick="{{ submitLogForm }}">Save session</button>
+              <button class="btn btn-ghost" onClick="{{ closeLogForm }}">Cancel</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <table class="table">
+          <thead>
+            <tr><th>Date</th><th>Topic</th><th>Duration</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ sessionsSorted }}" as="s" hint-placeholder-count="8">
+              <tr>
+                <td>{{ s.date }}</td>
+                <td>{{ s.module }}</td>
+                <td>{{ s.durationLabel }}</td>
+                <td style="color:var(--color-neutral-700)">{{ s.notes }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:560px">
+        <h1 style="font-family:var(--font-heading);font-size:32px;margin:0 0 32px;font-weight:700">Settings</h1>
+
+        <div style="border-top:2px solid var(--color-divider);padding:24px 0">
+          <div style="font-family:var(--font-heading);font-weight:700;margin-bottom:16px">Profile</div>
+          <div class="field" style="margin-bottom:16px">
+            <label>Name</label>
+            <input class="input" value="{{ profile.name }}" onChange="{{ onProfileNameChange }}"/>
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input class="input" value="{{ profile.email }}" onChange="{{ onProfileEmailChange }}"/>
+          </div>
+        </div>
+
+        <div style="border-top:2px solid var(--color-divider);padding:24px 0">
+          <div style="font-family:var(--font-heading);font-weight:700;margin-bottom:16px">Plan</div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:14px">Free — Rust only</div>
+              <div style="font-size:13px;color:var(--color-neutral-700);margin-top:2px">More languages when ZenTrackr opens up</div>
+            </div>
+            <span class="tag tag-outline">Upgrade soon</span>
+          </div>
+        </div>
+
+        <div style="border-top:2px solid var(--color-divider);padding:24px 0">
+          <div style="font-family:var(--font-heading);font-weight:700;margin-bottom:16px">Notifications</div>
+          <label style="display:flex;align-items:center;gap:10px;font-size:14px;margin-bottom:10px">
+            <input type="checkbox" checked="{{ profile.notifStreak }}" onChange="{{ onNotifStreakChange }}" style="accentColor:var(--color-accent)"/>
+            Remind me to keep my streak going
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;font-size:14px">
+            <input type="checkbox" checked="{{ profile.notifWeekly }}" onChange="{{ onNotifWeeklyChange }}" style="accentColor:var(--color-accent)"/>
+            Weekly progress summary
+          </label>
+        </div>
+
+        <div style="border-top:2px solid var(--color-divider);padding:24px 0">
+          <div style="font-family:var(--font-heading);font-weight:700;margin-bottom:16px">Danger zone</div>
+          <button class="btn btn-secondary" onClick="{{ resetProgress }}">Reset roadmap progress</button>
+        </div>
+      </div>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  addDays(delta) {
+    const d = new Date();
+    d.setDate(d.getDate() + delta);
+    return d.toISOString().slice(0, 10);
+  }
+
+  getModulesConfig() {
+    return [
+      { name: 'Fundamentals', topics: ['Variables & Mutability', 'Data Types', 'Functions', 'Control Flow', 'Comments'], doneCount: 5 },
+      { name: 'Ownership & Borrowing', topics: ['Ownership Rules', 'References & Borrowing', 'Slices', 'Lifetimes Intro'], doneCount: 3 },
+      { name: 'Structs & Enums', topics: ['Defining Structs', 'Method Syntax', 'Enums & Pattern Matching', 'Option<T>'], doneCount: 3 },
+      { name: 'Collections & Error Handling', topics: ['Vectors', 'Strings', 'HashMaps', 'Result<T, E>', 'panic! & Recoverable Errors'], doneCount: 3 },
+      { name: 'Generics & Traits', topics: ['Generic Types', 'Traits & Default Methods', 'Trait Bounds', 'Lifetimes in Structs'], doneCount: 3 },
+      { name: 'Testing & Cargo', topics: ['Writing Tests', 'Test Organization', 'Cargo Workspaces', 'Publishing Crates'], doneCount: 1 },
+      { name: 'Smart Pointers & Concurrency', topics: ['Box<T>', 'Rc<T> & RefCell<T>', 'Threads', 'Message Passing', 'Mutex<T>'], doneCount: 2 },
+      { name: 'Async Rust', topics: ['async/await Basics', 'Futures', 'Tokio Runtime', 'Streams'], doneCount: 0 },
+      { name: 'Advanced Topics', topics: ['Unsafe Rust', 'Macros', 'Trait Objects & dyn', 'FFI Basics'], doneCount: 0 },
+    ];
+  }
+
+  buildModules() {
+    return this.getModulesConfig().map((m, mi) => ({
+      id: 'm' + mi,
+      name: m.name,
+      topics: m.topics.map((n, ti) => ({
+        id: 'm' + mi + '-t' + ti,
+        name: n,
+        done: ti < m.doneCount,
+        resourceUrl: 'https://doc.rust-lang.org/book/',
+      })),
+    }));
+  }
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      tab: 'dashboard',
+      modules: this.buildModules(),
+      sessions: [
+        { id: 1, date: this.addDays(0), module: 'Async Rust', duration: 45, notes: 'Worked through async/await basics and Tokio intro.' },
+        { id: 2, date: this.addDays(-1), module: 'Smart Pointers & Concurrency', duration: 60, notes: 'Rc<T> and RefCell<T> examples.' },
+        { id: 3, date: this.addDays(-2), module: 'Smart Pointers & Concurrency', duration: 30, notes: 'Started the threads chapter.' },
+        { id: 4, date: this.addDays(-4), module: 'Generics & Traits', duration: 50, notes: 'Trait bounds practice problems.' },
+        { id: 5, date: this.addDays(-6), module: 'Generics & Traits', duration: 40, notes: 'Generic types exercises.' },
+        { id: 6, date: this.addDays(-9), module: 'Testing & Cargo', duration: 35, notes: 'Wrote first unit tests.' },
+        { id: 7, date: this.addDays(-13), module: 'Collections & Error Handling', duration: 25, notes: 'HashMap practice.' },
+        { id: 8, date: this.addDays(-18), module: 'Structs & Enums', duration: 60, notes: 'Pattern matching deep dive.' },
+      ],
+      nextSessionId: 9,
+      goalDate: '2026-10-01',
+      goalNote: 'Build and ship a CLI tool in Rust',
+      showLogForm: false,
+      logForm: { date: this.addDays(0), duration: '30', module: 'Fundamentals', notes: '' },
+      profile: { name: '', email: '', notifStreak: true, notifWeekly: false },
+    };
+  }
+
+  setTab(tab) { this.setState({ tab }); }
+
+  toggleTopic(moduleId, topicId) {
+    this.setState(s => ({
+      modules: s.modules.map(m => m.id !== moduleId ? m : {
+        ...m, topics: m.topics.map(t => t.id !== topicId ? t : { ...t, done: !t.done }),
+      }),
+    }));
+  }
+
+  updateTopicField(moduleId, topicId, field, value) {
+    this.setState(s => ({
+      modules: s.modules.map(m => m.id !== moduleId ? m : {
+        ...m, topics: m.topics.map(t => t.id !== topicId ? t : { ...t, [field]: value }),
+      }),
+    }));
+  }
+
+  removeTopic(moduleId, topicId) {
+    this.setState(s => ({
+      modules: s.modules.map(m => m.id !== moduleId ? m : { ...m, topics: m.topics.filter(t => t.id !== topicId) }),
+    }));
+  }
+
+  addTopic(moduleId) {
+    this.setState(s => ({
+      modules: s.modules.map(m => m.id !== moduleId ? m : {
+        ...m, topics: [...m.topics, { id: moduleId + '-t' + Date.now(), name: 'New topic', done: false, resourceUrl: '' }],
+      }),
+    }));
+  }
+
+  updateModuleName(moduleId, name) {
+    this.setState(s => ({ modules: s.modules.map(m => m.id !== moduleId ? m : { ...m, name }) }));
+  }
+
+  addModule() {
+    const id = 'm' + Date.now();
+    this.setState(s => ({ modules: [...s.modules, { id, name: 'New module', topics: [] }] }));
+  }
+
+  removeModule(moduleId) {
+    this.setState(s => ({ modules: s.modules.filter(m => m.id !== moduleId) }));
+  }
+
+  updateLogField(field, value) { this.setState(s => ({ logForm: { ...s.logForm, [field]: value } })); }
+
+  submitLogForm() {
+    const f = this.state.logForm;
+    if (!f.date || !f.duration) return;
+    this.setState(s => ({
+      sessions: [...s.sessions, { id: s.nextSessionId, date: f.date, module: f.module, duration: Number(f.duration) || 0, notes: f.notes }],
+      nextSessionId: s.nextSessionId + 1,
+      showLogForm: false,
+      logForm: { date: this.addDays(0), duration: '30', module: s.modules[0] ? s.modules[0].name : '', notes: '' },
+    }));
+  }
+
+  updateProfileField(field, value) { this.setState(s => ({ profile: { ...s.profile, [field]: value } })); }
+
+  resetProgress() {
+    if (!window.confirm('Reset all roadmap progress? This cannot be undone.')) return;
+    this.setState(s => ({ modules: s.modules.map(m => ({ ...m, topics: m.topics.map(t => ({ ...t, done: false })) })) }));
+  }
+
+  renderVals() {
+    const s = this.state;
+    const navDefs = [
+      { id: 'dashboard', label: 'Dashboard' },
+      { id: 'rust', label: 'Rust' },
+      { id: 'edit', label: 'Edit Roadmap' },
+      { id: 'stats', label: 'Stats' },
+      { id: 'history', label: 'History' },
+      { id: 'settings', label: 'Settings' },
+    ];
+    const navItems = navDefs.map(n => {
+      const active = n.id === s.tab;
+      return {
+        id: n.id,
+        label: n.label,
+        onClick: () => this.setTab(n.id),
+        style: `text-align:left;padding:12px 28px;border:none;background:${active ? 'var(--color-neutral-200)' : 'transparent'};color:var(--color-text);font-family:var(--font-body);font-size:14px;font-weight:${active ? '700' : '400'};border-left:2px solid ${active ? 'var(--color-accent)' : 'transparent'};cursor:pointer`,
+      };
+    });
+
+    const allTopics = [];
+    s.modules.forEach(m => m.topics.forEach(t => allTopics.push({ ...t, moduleName: m.name })));
+    const totalTopics = allTopics.length;
+    const doneTopics = allTopics.filter(t => t.done).length;
+    const overallPct = totalTopics ? Math.round((doneTopics / totalTopics) * 100) : 0;
+
+    const moduleStats = s.modules.map(m => {
+      const total = m.topics.length;
+      const done = m.topics.filter(t => t.done).length;
+      const pct = total ? Math.round((done / total) * 100) : 0;
+      return {
+        id: m.id, name: m.name, total, done, pct,
+        topics: m.topics.map(t => ({
+          ...t,
+          onToggle: () => this.toggleTopic(m.id, t.id),
+          textStyle: t.done ? 'color:var(--color-neutral-700);text-decoration:line-through' : '',
+        })),
+      };
+    });
+
+    const nextFlat = allTopics.find(t => !t.done) || allTopics[0];
+    const nextModule = moduleStats.find(m => m.topics.some(t => t.id === nextFlat.id));
+    const nextTopic = nextFlat ? {
+      name: nextFlat.name,
+      moduleName: nextFlat.moduleName,
+      moduleBarStyle: nextModule ? `width:${nextModule.pct}%` : 'width:0%',
+      moduleProgressLabel: nextModule ? `${nextModule.done}/${nextModule.total} in ${nextModule.name}` : '',
+    } : { name: 'All topics complete', moduleName: '', moduleBarStyle: 'width:100%', moduleProgressLabel: '' };
+
+    const sessionsSorted = [...s.sessions].sort((a, b) => b.date.localeCompare(a.date)).map(sn => ({
+      ...sn, durationLabel: sn.duration + ' min',
+    }));
+    const recentSessions = sessionsSorted.slice(0, 5);
+    const totalMinutes = s.sessions.reduce((a, sn) => a + sn.duration, 0);
+    const totalHoursLabel = (totalMinutes / 60).toFixed(1) + 'h';
+
+    const dateSet = new Set(s.sessions.map(sn => sn.date));
+    let streak = 0;
+    for (let i = 0; i < 365; i++) {
+      if (dateSet.has(this.addDays(-i))) streak++; else break;
+    }
+
+    const goalDaysLeft = Math.max(0, Math.ceil((new Date(s.goalDate) - new Date(this.addDays(0))) / 86400000));
+
+    const minutesByDate = {};
+    s.sessions.forEach(sn => { minutesByDate[sn.date] = (minutesByDate[sn.date] || 0) + sn.duration; });
+    const weekVals = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = this.addDays(-i);
+      weekVals.push({ date, minutes: minutesByDate[date] || 0 });
+    }
+    const maxMinutes = Math.max(1, ...weekVals.map(d => d.minutes));
+    const weekChart = weekVals.map(d => ({
+      label: new Date(d.date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short' }),
+      minutes: d.minutes,
+      barStyle: `height:${Math.max(4, Math.round((d.minutes / maxMinutes) * 130))}px`,
+    }));
+
+    const heatmap = [];
+    for (let i = 13; i >= 0; i--) {
+      const date = this.addDays(-i);
+      const active = dateSet.has(date);
+      heatmap.push({ date, style: `background:${active ? 'var(--color-neutral-800)' : 'var(--color-neutral-200)'}` });
+    }
+
+    const editModules = s.modules.map(m => ({
+      id: m.id,
+      name: m.name,
+      onNameChange: e => this.updateModuleName(m.id, e.target.value),
+      onRemove: () => this.removeModule(m.id),
+      onAddTopic: () => this.addTopic(m.id),
+      topics: m.topics.map(t => ({
+        ...t,
+        onToggle: () => this.toggleTopic(m.id, t.id),
+        onNameChange: e => this.updateTopicField(m.id, t.id, 'name', e.target.value),
+        onResourceChange: e => this.updateTopicField(m.id, t.id, 'resourceUrl', e.target.value),
+        onRemove: () => this.removeTopic(m.id, t.id),
+      })),
+    }));
+
+    return {
+      navItems,
+      isDashboard: s.tab === 'dashboard',
+      isRust: s.tab === 'rust',
+      isEdit: s.tab === 'edit',
+      isStats: s.tab === 'stats',
+      isHistory: s.tab === 'history',
+      isSettings: s.tab === 'settings',
+      goToRust: () => this.setTab('rust'),
+      goToEdit: () => this.setTab('edit'),
+      goToHistory: () => this.setTab('history'),
+      totalTopics, doneTopics, overallPct,
+      moduleStats, editModules,
+      nextTopic,
+      sessionsSorted, recentSessions,
+      totalHoursLabel,
+      streak,
+      goalDate: s.goalDate,
+      goalNote: s.goalNote,
+      goalDaysLeft,
+      weekChart,
+      heatmap,
+      addModule: () => this.addModule(),
+      showLogForm: s.showLogForm,
+      openLogForm: () => this.setState({ showLogForm: true }),
+      closeLogForm: () => this.setState({ showLogForm: false }),
+      logForm: s.logForm,
+      moduleNames: s.modules.map(m => m.name),
+      onLogDateChange: e => this.updateLogField('date', e.target.value),
+      onLogDurationChange: e => this.updateLogField('duration', e.target.value),
+      onLogModuleChange: e => this.updateLogField('module', e.target.value),
+      onLogNotesChange: e => this.updateLogField('notes', e.target.value),
+      submitLogForm: () => this.submitLogForm(),
+      profile: s.profile,
+      onProfileNameChange: e => this.updateProfileField('name', e.target.value),
+      onProfileEmailChange: e => this.updateProfileField('email', e.target.value),
+      onNotifStreakChange: e => this.updateProfileField('notifStreak', e.target.checked),
+      onNotifWeeklyChange: e => this.updateProfileField('notifWeekly', e.target.checked),
+      resetProgress: () => this.resetProgress(),
+    };
+  }
+}
+</script>
+</body>
+</html>
