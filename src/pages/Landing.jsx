@@ -51,8 +51,11 @@ export default function Landing({ onDemo }) {
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 56px', borderBottom: '2px solid var(--color-divider)' }}>
-        <div style={{ fontFamily: 'var(--font-heading)', fontWeight: 600, fontSize: 20, letterSpacing: '0.02em' }}>
-          Z<span style={{ fontSize: '0.72em' }}>EN</span>T<span style={{ fontSize: '0.72em' }}>RACKR</span>
+        <div>
+          <div style={{ fontFamily: 'var(--font-heading)', fontWeight: 600, fontSize: 20, letterSpacing: '0.02em' }}>
+            Z<span style={{ fontSize: '0.72em' }}>EN</span>T<span style={{ fontSize: '0.72em' }}>RACKR</span>
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--color-neutral-600)', marginTop: 3 }}>Track the grind.</div>
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
           <button className="btn btn-ghost" onClick={openSignIn}>Sign in</button>
