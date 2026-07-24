@@ -8,17 +8,10 @@ export function computeStats(modules, sessions) {
 
   const hoursLogged = sessions.reduce((s, r) => s + r.duration_minutes, 0) / 60
 
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  let streak = 0
-  const sessionDays = new Set(sessions.map(s => s.session_date))
-  for (let d = 0; ; d++) {
-    const day = new Date(today)
-    day.setDate(today.getDate() - d)
-    const key = day.toISOString().slice(0, 10)
-    if (sessionDays.has(key)) streak++
-    else break
-  }
+  const streak = streakFromDates(sessions.map(s => s.session_date))
+  const todayMinutes = sessions
+    .filter(s => s.session_date === todayIso())
+    .reduce((sum, s) => sum + s.duration_minutes, 0)
 
   const nextTopic = (() => {
     for (const m of modules) {
@@ -34,7 +27,26 @@ export function computeStats(modules, sessions) {
     return { ...m, total, done, pct: total ? Math.round((done / total) * 100) : 0 }
   })
 
-  return { totalTopics, doneTopics, overallPct, hoursLogged, streak, nextTopic, moduleStats }
+  return { totalTopics, doneTopics, overallPct, hoursLogged, streak, todayMinutes, nextTopic, moduleStats }
+}
+
+// Consecutive days with a session, counting back from today. A day without
+// a session only breaks the streak once it's over — no session yet today
+// still shows yesterday's streak.
+export function streakFromDates(dates) {
+  const days = new Set(dates)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  let streak = 0
+  for (let d = 0; ; d++) {
+    const day = new Date(today)
+    day.setDate(today.getDate() - d)
+    const key = day.toISOString().slice(0, 10)
+    if (days.has(key)) streak++
+    else if (d === 0) continue
+    else break
+  }
+  return streak
 }
 
 export function last7DaysBars(sessions) {

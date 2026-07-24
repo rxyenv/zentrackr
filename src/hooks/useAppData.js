@@ -65,7 +65,10 @@ export function useAppData(userId) {
         .eq('user_id', userId)
         .single()
 
-      setProfile(prof || { user_id: userId, name: '', notif_streak: true, notif_weekly: false })
+      setProfile(prof || {
+        user_id: userId, name: '', notif_streak: true, notif_weekly: false,
+        daily_goal_minutes: 30, share_slug: null, share_enabled: false,
+      })
     } catch (e) {
       setError(e.message || 'Failed to load data')
     } finally {
@@ -86,11 +89,11 @@ export function useAppData(userId) {
   }
 
   async function updateTopicField(topicId, field, value) {
+    const col = field === 'resourceUrl' ? 'resource_url' : field
     setModules(prev => prev.map(m => ({
       ...m,
-      topics: m.topics.map(t => t.id === topicId ? { ...t, [field]: value } : t),
+      topics: m.topics.map(t => t.id === topicId ? { ...t, [col]: value } : t),
     })))
-    const col = field === 'resourceUrl' ? 'resource_url' : 'name'
     await supabase.from('topics').update({ [col]: value }).eq('id', topicId)
   }
 
@@ -169,7 +172,9 @@ export function useAppData(userId) {
   async function updateProfile(fields) {
     const updated = { ...profile, ...fields }
     setProfile(updated)
-    await supabase.from('profiles').upsert({ user_id: userId, ...updated })
+    const { error: upsertErr } = await supabase.from('profiles').upsert({ user_id: userId, ...updated })
+    if (upsertErr) setProfile(profile)
+    return { error: upsertErr }
   }
 
   return {

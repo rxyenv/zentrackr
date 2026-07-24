@@ -23,6 +23,7 @@ function buildModules() {
       name,
       done: ti < m.doneCount,
       resource_url: '',
+      notes: '',
       position: ti,
     })),
   }))
@@ -54,7 +55,10 @@ export function useMockData() {
     goal_date: offset(new Date(), 60),
     goal_note: 'Ship a Rust CLI tool',
   })
-  const [profile] = useState({ user_id: 'demo', name: 'Demo User', notif_streak: true, notif_weekly: false })
+  const [profile] = useState({
+    user_id: 'demo', name: 'Demo User', notif_streak: true, notif_weekly: false,
+    daily_goal_minutes: 30, share_slug: null, share_enabled: false,
+  })
 
   function toggleTopic(topicId, done) {
     setModules(prev => prev.map(m => ({

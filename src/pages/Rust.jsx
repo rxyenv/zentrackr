@@ -1,11 +1,40 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-export default function Rust({ modules, toggleTopic }) {
+function TopicNotes({ topic, updateTopicField }) {
+  const [draft, setDraft] = useState(topic.notes || '')
+
+  return (
+    <div className="topic-notes">
+      <textarea
+        className="input"
+        value={draft}
+        onChange={e => setDraft(e.target.value)}
+        onBlur={() => {
+          if (draft !== (topic.notes || '')) updateTopicField(topic.id, 'notes', draft)
+        }}
+        placeholder="What did you learn? Gotchas, snippets, links…"
+        rows={3}
+      />
+    </div>
+  )
+}
+
+export default function Rust({ modules, toggleTopic, updateTopicField }) {
   const navigate = useNavigate()
+  const [openNotes, setOpenNotes] = useState(() => new Set())
   const allTopics = modules.flatMap(m => m.topics)
   const totalTopics = allTopics.length
   const doneTopics = allTopics.filter(t => t.done).length
   const overallPct = totalTopics ? Math.round((doneTopics / totalTopics) * 100) : 0
+
+  function toggleNotes(topicId) {
+    setOpenNotes(prev => {
+      const next = new Set(prev)
+      next.has(topicId) ? next.delete(topicId) : next.add(topicId)
+      return next
+    })
+  }
 
   return (
     <div>
@@ -34,25 +63,37 @@ export default function Rust({ modules, toggleTopic }) {
               <span className="module-count">{mDone}/{m.topics.length}</span>
             </div>
             {m.topics.map(t => (
-              <div className="topic-row" key={t.id}>
-                <input
-                  type="checkbox"
-                  checked={t.done}
-                  onChange={e => toggleTopic(t.id, e.target.checked)}
-                  id={`topic-${t.id}`}
-                />
-                <label htmlFor={`topic-${t.id}`} className={`topic-name${t.done ? ' done' : ''}`} style={{ cursor: 'pointer' }}>
-                  {t.name}
-                </label>
-                {t.resource_url && (
-                  <a
-                    href={t.resource_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="topic-resource-link"
+              <div key={t.id}>
+                <div className="topic-row">
+                  <input
+                    type="checkbox"
+                    checked={t.done}
+                    onChange={e => toggleTopic(t.id, e.target.checked)}
+                    id={`topic-${t.id}`}
+                  />
+                  <label htmlFor={`topic-${t.id}`} className={`topic-name${t.done ? ' done' : ''}`} style={{ cursor: 'pointer' }}>
+                    {t.name}
+                  </label>
+                  {t.resource_url && (
+                    <a
+                      href={t.resource_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="topic-resource-link"
+                    >
+                      Resource ↗
+                    </a>
+                  )}
+                  <button
+                    className={`topic-notes-toggle${t.notes ? ' has-notes' : ''}`}
+                    onClick={() => toggleNotes(t.id)}
+                    title={t.notes ? 'View notes' : 'Add notes'}
                   >
-                    Resource ↗
-                  </a>
+                    {openNotes.has(t.id) ? 'Notes ▴' : t.notes ? 'Notes ●' : 'Notes +'}
+                  </button>
+                </div>
+                {openNotes.has(t.id) && (
+                  <TopicNotes topic={t} updateTopicField={updateTopicField} />
                 )}
               </div>
             ))}

@@ -11,6 +11,7 @@ import EditRoadmap from './pages/EditRoadmap'
 import Stats from './pages/Stats'
 import History from './pages/History'
 import Settings from './pages/Settings'
+import Share from './pages/Share'
 
 function AppRoutes() {
   const session = useAuth()
@@ -27,6 +28,7 @@ function AppRoutes() {
     return (
       <Routes>
         <Route path="/" element={<Landing onDemo={() => setDemo(true)} />} />
+        <Route path="/u/:slug" element={<Share />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     )
@@ -36,6 +38,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/u/:slug" element={<Share />} />
       <Route path="/*" element={<AuthedApp userId={session.user.id} />} />
     </Routes>
   )
@@ -72,10 +75,10 @@ function AppShell({ data, demo, onExitDemo }) {
     <Layout demo={demo} onExitDemo={onExitDemo}>
       <Routes>
         <Route path="/dashboard" element={
-          <Dashboard modules={data.modules} sessions={data.sessions} language={data.language} />
+          <Dashboard modules={data.modules} sessions={data.sessions} language={data.language} profile={data.profile} />
         } />
         <Route path="/rust" element={
-          <Rust modules={data.modules} toggleTopic={data.toggleTopic} />
+          <Rust modules={data.modules} toggleTopic={data.toggleTopic} updateTopicField={data.updateTopicField} />
         } />
         <Route path="/roadmap/edit" element={
           <EditRoadmap

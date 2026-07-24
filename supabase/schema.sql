@@ -52,6 +52,7 @@ create table public.topics (
   name text not null,
   done boolean not null default false,
   resource_url text,
+  notes text,
   position int not null default 0,
   created_at timestamptz not null default now()
 );
@@ -103,7 +104,10 @@ create table public.profiles (
   user_id uuid primary key references auth.users(id) on delete cascade,
   name text,
   notif_streak boolean not null default true,
-  notif_weekly boolean not null default false
+  notif_weekly boolean not null default false,
+  daily_goal_minutes int not null default 30,
+  share_slug text unique,
+  share_enabled boolean not null default false
 );
 
 alter table public.profiles enable row level security;
@@ -131,6 +135,50 @@ $$;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
+
+-- Public share page. security definer RPC instead of anon RLS policies:
+-- anon never gets direct table access, only this exact shape, and only
+-- when the owner flipped share_enabled on.
+create or replace function public.get_public_profile(slug text)
+returns json
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select json_build_object(
+    'name', p.name,
+    'language', l.name,
+    'goal_note', l.goal_note,
+    'modules', coalesce((
+      select json_agg(json_build_object(
+        'name', m.name,
+        'total', (select count(*) from topics t where t.module_id = m.id),
+        'done', (select count(*) from topics t where t.module_id = m.id and t.done)
+      ) order by m.position)
+      from modules m where m.language_id = l.id
+    ), '[]'::json),
+    'session_dates', coalesce((
+      select json_agg(distinct s.session_date)
+      from sessions s where s.user_id = p.user_id
+    ), '[]'::json),
+    'total_minutes', coalesce((
+      select sum(s.duration_minutes)
+      from sessions s where s.user_id = p.user_id
+    ), 0)
+  )
+  from profiles p
+  left join lateral (
+    select * from languages
+    where user_id = p.user_id
+    order by created_at
+    limit 1
+  ) l on true
+  where p.share_slug = slug and p.share_enabled
+  limit 1;
+$$;
+
+grant execute on function public.get_public_profile(text) to anon, authenticated;
 
 -- Table grants: RLS filters rows, but roles still need base privileges.
 grant usage on schema public to authenticated, anon;

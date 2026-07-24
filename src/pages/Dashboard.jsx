@@ -1,11 +1,14 @@
 import { useNavigate } from 'react-router-dom'
 import { computeStats, daysToGoal, formatDate } from '../lib/derive'
 
-export default function Dashboard({ modules, sessions, language }) {
+export default function Dashboard({ modules, sessions, language, profile }) {
   const navigate = useNavigate()
-  const { overallPct, streak, hoursLogged, nextTopic, moduleStats } = computeStats(modules, sessions)
+  const { overallPct, streak, hoursLogged, todayMinutes, nextTopic, moduleStats } = computeStats(modules, sessions)
   const days = daysToGoal(language?.goal_date)
   const recentSessions = sessions.slice(0, 5)
+  const dailyGoal = profile?.daily_goal_minutes || 0
+  const todayPct = dailyGoal ? Math.min(100, Math.round((todayMinutes / dailyGoal) * 100)) : 0
+  const goalMet = dailyGoal > 0 && todayMinutes >= dailyGoal
 
   const nextMod = nextTopic
     ? moduleStats.find(m => m.id === nextTopic.module.id)
@@ -29,7 +32,7 @@ export default function Dashboard({ modules, sessions, language }) {
         </div>
         <div className="stat-cell">
           <div className="stat-label">Current streak</div>
-          <div className="stat-value">{streak}d</div>
+          <div className="stat-value">{streak > 0 && '🔥'}{streak}d</div>
         </div>
         <div className="stat-cell">
           <div className="stat-label">Hours logged</div>
@@ -40,6 +43,30 @@ export default function Dashboard({ modules, sessions, language }) {
           <div className="stat-value">{days !== null ? days : '—'}</div>
         </div>
       </div>
+
+      {dailyGoal > 0 && (
+        <div className="today-goal-card">
+          <div className="section-header-row" style={{ marginBottom: 'var(--space-2)' }}>
+            <span className="section-title">Today</span>
+            <span className={`tag ${goalMet ? 'tag-accent' : 'tag-neutral'}`}>
+              {goalMet ? 'Daily goal met ✓' : `${todayMinutes} / ${dailyGoal} min`}
+            </span>
+          </div>
+          <div className="progress-track">
+            <div className="progress-fill accent" style={{ width: `${todayPct}%` }} />
+          </div>
+          {!goalMet && (
+            <div style={{ fontSize: 13, color: 'var(--color-neutral-700)', marginTop: 'var(--space-2)' }}>
+              {todayMinutes === 0
+                ? `Log a session to keep your ${streak > 0 ? `${streak}-day streak` : 'streak'} going.`
+                : `${dailyGoal - todayMinutes} min left to hit today's goal.`}
+              <button className="btn btn-ghost" style={{ marginLeft: 8 }} onClick={() => navigate('/history')}>
+                Log session →
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="two-col">
         <div className="two-col-left">

@@ -476,3 +476,46 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
+
+/* Today / daily goal card */
+.today-goal-card {
+  background: var(--color-surface);
+  padding: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+/* Topic notes */
+.topic-notes-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-size: 12px;
+  color: var(--color-neutral-600);
+  padding: 2px 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.topic-notes-toggle:hover { color: var(--color-accent); }
+.topic-notes-toggle.has-notes { color: var(--color-accent); }
+
+.topic-notes {
+  padding: var(--space-2) 0 var(--space-3) 28px;
+}
+.topic-notes textarea {
+  font-size: 13px;
+}
+
+/* Public share page */
+.share-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: var(--space-8) var(--space-4);
+  background: var(--color-bg);
+}
+
+.share-card {
+  width: 100%;
+  max-width: 640px;
+}
